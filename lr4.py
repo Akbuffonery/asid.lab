@@ -6,7 +6,7 @@ def read_matrix_from_file(filename):
 def main():
     k = int(input("Введите k: "))
     n = int(input("Введите размер матрицы N: "))
-    with open('matrix.txt') as f: #!!!Главное чтобы размер матрицы в файле была равна вводу k и n.
+    with open('matrix2.txt') as f: #!!!Главное чтобы размер матрицы в файле была равна вводу k и n.
         A = np.array([list(map(int, line.split()))[:n] for line in f][:n])
     print("Исходная матрица A:\n", A)
     F = A.copy()
@@ -25,20 +25,26 @@ def main():
             perimeter.extend(C[1:-1, -1])  # Правый столбец
     perimeter_product = np.prod(perimeter) if perimeter else 0
     if zero_count > perimeter_product: # Преобразование матрицы F
-        if n % 2 == 0: #Меняем B и C симметрично
+        if n % 2 == 0:
+            # Меняем B и C местами с транспонированием и отражением
             B = F[half:, half:].copy()
-            F[half:, half:] = np.fliplr(C.T)
-            F[:half, half:] = np.fliplr(B.T)
+            C = F[:half, half:].copy()
+            F[half:, half:] = np.fliplr(C.T)  # Заменяем B на отражённую C
+            F[:half, half:] = np.fliplr(B.T)  # Заменяем C на отражённую B
         else:
             B = F[half + 1:, half + 1:].copy()
+            C = F[:half, half + 1:].copy()
             F[half + 1:, half + 1:] = np.fliplr(C.T)
             F[:half, half + 1:] = np.fliplr(B.T)
     else:
-        if n % 2 == 0: #Меняем C и E несимметрично
+        if n % 2 == 0:
+            # Меняем C и E местами (без отражения)
+            C = F[:half, half:].copy()
             E = F[half:, :half].copy()
-            F[:half, half:] = E
-            F[half:, :half] = C
+            F[:half, half:] = E  # Заменяем C на E
+            F[half:, :half] = C  # Заменяем E на C
         else:
+            C = F[:half, half + 1:].copy()
             E = F[half + 1:, :half + 1].copy()
             F[:half, half + 1:] = E
             F[half + 1:, :half + 1] = C
@@ -54,17 +60,20 @@ def main():
         result = (A + G - F) * k
     print("\nРезультат вычислений (A + tril(A) - F) * K:\n", result)
     plt.figure(figsize=(15, 5))
-    plt.subplot(131) # 1. Визуализация матрицы F
-    plt.imshow(F, cmap='viridis')
+    # 1. Тепловая карта матрицы F
+    plt.subplot(131)
+    plt.imshow(F, cmap='magma', interpolation='nearest')
     plt.colorbar()
-    plt.title("Матрица F")
-    plt.subplot(132) # 2. Сумма элементов по строкам
-    plt.plot(F.sum(axis=1), 'o-')
+    plt.title("Тепловая карта F")
+    # 2. График суммы по строкам (линейный)
+    plt.subplot(132)
+    plt.plot(F.sum(axis=1), 'o-', color='blue')
     plt.title("Сумма по строкам")
     plt.grid(True)
-    plt.subplot(133) # 3. Сумма элементов по столбцам
-    plt.plot(F.sum(axis=0), 's-')
-    plt.title("Сумма по столбцам")
+    # 3. Столбчатая диаграмма суммы по столбцам (вместо линейного)
+    plt.subplot(133)
+    plt.bar(range(F.shape[1]), F.sum(axis=0), color='green', alpha=0.7)
+    plt.title("Сумма по столбцам (bar)")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
