@@ -218,7 +218,7 @@ def run_right_hand_step():
         draw_correct_path()
         game_over = True
         running_search = False
-        messagebox.showinfo("Победа", f"Таракан нашёл выход")
+        messagebox.showinfo("Победа", f"Паучок нашёл выход")
         return
     visited_cells.add((x, y))
     directions_to_try = get_right_hand_directions(current_direction)
@@ -239,7 +239,7 @@ def run_right_hand_step():
             player, current_direction = path_history[-1]
         else:
             running_search = False
-            messagebox.showinfo("Поиск завершен", "Таракан зашел в тупик")
+            messagebox.showinfo("Поиск завершен", "Паучок зашел в тупик")
             return
     # Сначала рисуем лабиринт и выходы
     draw_maze()
